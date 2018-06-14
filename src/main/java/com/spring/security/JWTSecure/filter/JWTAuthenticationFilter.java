@@ -14,20 +14,22 @@ import org.springframework.web.filter.GenericFilterBean;
 
 import com.spring.security.JWTSecure.service.TokenAuthenticationService;
 
-public class JWTAuthenticationFilter extends GenericFilterBean
-	{
+//For Authenticate Request with token in request
+
+public class JWTAuthenticationFilter extends GenericFilterBean{
 
 	@Override
-	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-			throws IOException, ServletException {
+	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)throws IOException, ServletException {
 
 		System.out.println("JWTAuthenticationFilter.doFilter");
 
-		Authentication authentication = TokenAuthenticationService
-				.getAuthentication((HttpServletRequest) servletRequest);
-
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-
+		Authentication authentication;
+		try {
+			authentication = TokenAuthenticationService.getAuthentication((HttpServletRequest) servletRequest);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		filterChain.doFilter(servletRequest, servletResponse);
 	}
 }

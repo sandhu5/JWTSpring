@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.spring.security.JWTSecure.filter.JWTAuthenticationFilter;
 import com.spring.security.JWTSecure.filter.JWTLoginFilter;
 
+//configure users , their roles and  other custom filters
+
+@EnableWebSecurity
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -25,20 +29,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/").permitAll() //
 				.antMatchers(HttpMethod.POST, "/login").permitAll() //
 				.antMatchers(HttpMethod.GET, "/login").permitAll() // For Test on Browser
+				//.antMatchers("/test").access("hasRole('ADMIN')")
 				// Need authentication.
 				.anyRequest().authenticated()
 				//
 				.and()
-				//
 				// Add Filter 1 - JWTLoginFilter
-				//
-				.addFilterBefore(new JWTLoginFilter("/login", authenticationManager()),
-						UsernamePasswordAuthenticationFilter.class)
-				//
+				.addFilterBefore(new JWTLoginFilter("/login", authenticationManager()),UsernamePasswordAuthenticationFilter.class)
 				// Add Filter 2 - JWTAuthenticationFilter
-				//
-				.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-				.addFilterBefore(new JWTLoginFilter(), UsernamePasswordAuthenticationFilter.class);
+				.addFilterBefore(new JWTAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 
 	@Bean
@@ -49,28 +48,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		String tomPassword = "12345678";
+		String jerryPassword = "12345678";
+		String dbaPassword = "12345678";
+		String guestPassword = "12345678";
+		
+		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> 	mngConfig = auth.inMemoryAuthentication();
 
-		String password = "123";
+		UserDetails user1 = User.withUsername("tom").password(this.passwordEncoder().encode(tomPassword)).roles("USER").build();
+		UserDetails admin1 = User.withUsername("jerry").password(this.passwordEncoder().encode(jerryPassword)).roles("ADMIN").build();
+		UserDetails dba1 = User.withUsername("dba").password(this.passwordEncoder().encode(dbaPassword)).roles("USER").build();
+		UserDetails guest1 = User.withUsername("guest").password(this.passwordEncoder().encode(guestPassword)).roles("USER").build();
 
-		String encrytedPassword = this.passwordEncoder().encode(password);
-		System.out.println("Encoded password of 123=" + encrytedPassword);
-
-		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> //
-		mngConfig = auth.inMemoryAuthentication();
-
-		// Defines 2 users, stored in memory.
-		// ** Spring BOOT >= 2.x (Spring Security 5.x)
-		// Spring auto add ROLE_
-		UserDetails u1 = User.withUsername("tom").password(encrytedPassword).roles("USER").build();
-		UserDetails u2 = User.withUsername("jerry").password(encrytedPassword).roles("USER").build();
-
-		mngConfig.withUser(u1);
-		mngConfig.withUser(u2);
-
-		// If Spring BOOT < 2.x (Spring Security 4.x)):
-		// Spring auto add ROLE_
-		// mngConfig.withUser("tom").password("123").roles("USER");
-		// mngConfig.withUser("jerry").password("123").roles("USER");
+		mngConfig.withUser(user1);
+		mngConfig.withUser(admin1);
+		mngConfig.withUser(dba1);
+		mngConfig.withUser(guest1);
 
 	}
 
