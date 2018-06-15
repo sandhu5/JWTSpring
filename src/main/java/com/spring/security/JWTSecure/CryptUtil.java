@@ -42,7 +42,7 @@ public class CryptUtil {
 	}
 
 	public static Key generateKey() throws Exception {
-		cryptKey = "1Hbfh667adfDEJ78";
+		cryptKey = "1Hbfh667adgHCJ82";
 		Key key = new SecretKeySpec(CryptUtil.cryptKey.getBytes(), CryptUtil.ALGORITHM);
 		return key;
 	}

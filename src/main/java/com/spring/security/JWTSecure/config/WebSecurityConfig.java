@@ -48,10 +48,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		String tomPassword = "12345678";
-		String jerryPassword = "12345678";
-		String dbaPassword = "12345678";
-		String guestPassword = "12345678";
+		String tomPassword = "12345";
+		String jerryPassword = "12345";
+		String dbaPassword = "123456";
+		String guestPassword = "12345";
 		
 		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> 	mngConfig = auth.inMemoryAuthentication();
 
